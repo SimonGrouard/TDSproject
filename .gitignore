@@ -4,3 +4,4 @@
 **/parameters
 **/*.zip
 .Rproj.user
+*.swp
