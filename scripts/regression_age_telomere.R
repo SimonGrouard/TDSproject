@@ -1,6 +1,6 @@
 rm(list=ls())
 path<-dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(path) 
+setwd(path) # the data is not is this folder
 getwd()
 
 library(tidyverse)
