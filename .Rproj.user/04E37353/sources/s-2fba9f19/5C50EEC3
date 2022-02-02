@@ -1,0 +1,24 @@
+{
+    "id": "5C50EEC3",
+    "path": "/rds/general/user/st121/projects/hda_21-22/live/TDS/Group_6/extraction_and_recording/2-extract_selected.sh",
+    "project_path": "extraction_and_recording/2-extract_selected.sh",
+    "type": "sh",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643387052898.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "cursorPosition": "0,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1643486359,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643486359,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,5 +1,6 @@
-.Rproj.user
-data/
-extraction_and_recording/
-outcome_definition/
+*.Rproj
 .Rhistory
+**/docs
+**/outputs
+**/parameters
+**/*.zip

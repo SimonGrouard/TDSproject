@@ -1,0 +1,32 @@
+{
+    "id": "AD2FAF73",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643553228813.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "expression": "ukb_extracted",
+        "caption": "ukb_extracted",
+        "totalObservations": 502461,
+        "displayedObservations": 502461,
+        "variables": 4877,
+        "cacheKey": "2EF66AB3",
+        "object": "ukb_extracted",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=ukb_extracted&cache_key=2EF66AB3&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 2318270133864854132,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643553228813,
+    "read_only": false,
+    "read_only_alternatives": []
+}

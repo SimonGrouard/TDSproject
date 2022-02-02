@@ -1,0 +1,32 @@
+{
+    "id": "1833CDAF",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643364623578.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "expression": "Data_Dictionary_Showcase",
+        "caption": "Data_Dictionary_Showcase",
+        "totalObservations": 7829,
+        "displayedObservations": 7829,
+        "variables": 17,
+        "cacheKey": "01C4A52D",
+        "object": "Data_Dictionary_Showcase",
+        "environment": "",
+        "contentUrl": "grid_resource/gridviewer.html?env=&obj=Data_Dictionary_Showcase&cache_key=01C4A52D&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 2334102040480935200,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643364623578,
+    "read_only": false,
+    "read_only_alternatives": []
+}

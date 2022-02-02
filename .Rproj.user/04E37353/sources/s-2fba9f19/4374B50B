@@ -1,0 +1,24 @@
+{
+    "id": "4374B50B",
+    "path": "/rds/general/user/st121/projects/hda_21-22/live/TDS/Group_6/scripts/descriptive_analysis.R",
+    "project_path": "scripts/descriptive_analysis.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1643538101333.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "11,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1643543116,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643543116021,
+    "read_only": false,
+    "read_only_alternatives": []
+}

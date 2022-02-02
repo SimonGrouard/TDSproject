@@ -1,0 +1,1 @@
+hist(Toy_dataset[,1])

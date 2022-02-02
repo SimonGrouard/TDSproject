@@ -1,0 +1,41 @@
+rm(list=ls())
+library(data.table)
+library(tidyverse)
+
+# Loading an extract of the data (500 rows and 1,000 columns)
+mydata=fread("../../../General/Data/ukb47946.csv", data.table=FALSE, nrows=500, select=1:1000)
+head(mydata) %>% View()
+
+dt <- readRDS("./extraction_and_recoding/outputs/ukb_extracted.rds")
+head(dt)
+View(head(dt,20))
+
+annot <- readRDS("./extraction_and_recoding/outputs/annot.rds")
+head(annot)
+
+dim(dt)
+dt %>% filter(!is.na(asthma_age_diag.0.0)) %>% count()
+dt <- dt %>% mutate(child_ind = factor(ifelse(asthma_age_diag.0.0 <18,1,0)))
+
+
+dt %>% filter(!is.na(asthma_age_diag.0.0),
+              !is.na(Sex.0.0),
+              asthma_age_diag.0.0 >= 0) %>% 
+  ggplot(aes(asthma_age_diag.0.0, fill = child_ind)) + 
+  geom_histogram()+ 
+  facet_wrap(~Sex.0.0)+ 
+  scale_fill_brewer(palette = 'Set2')+
+  theme_classic()
+
+dt %>% ggplot(aes(x = asthma_age_diag.0.0,y = hayfever_age.0.0, col = asthma_age_diag.0.0))+
+  geom_point() + theme_classic()
+
+dt %>% filter(child_ind == 0, asthma_age_diag.0.0 >= 0 ) %>% count()
+
+
+dt %>% filter(asthma_age_diag.0.0 >= 0) %>% ggplot(aes(x = age_asthma_diag.0.0,y=asthma_age_diag.0.0, 
+                  color = asthma_age_diag.0.0))+ geom_point() + 
+  theme_classic() +xlab("follow up - age of asthma 15k") + ylab("baseline age of asthma 57k")
+
+
+dt %>% group_by(asthma_age_diag.0.0) %>% count()

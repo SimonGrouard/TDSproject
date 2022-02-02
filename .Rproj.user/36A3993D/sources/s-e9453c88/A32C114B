@@ -1,0 +1,24 @@
+{
+    "id": "A32C114B",
+    "path": "/rds/general/user/fp4818/projects/hda_21-22/live/TDS/Group_6/extraction_and_recoding_simon/scripts/1-make_data_dict.R",
+    "project_path": "extraction_and_recoding_simon/scripts/1-make_data_dict.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": true,
+    "created": 1643364827685.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "9,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1643365462,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1643365462,
+    "read_only": false,
+    "read_only_alternatives": []
+}
