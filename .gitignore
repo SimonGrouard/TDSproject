@@ -1,5 +1,5 @@
-*.Rproj
-.Rhistory
+*.Rproj*/**
+.Rhistory/**
 **/docs
 **/outputs
 **/parameters
