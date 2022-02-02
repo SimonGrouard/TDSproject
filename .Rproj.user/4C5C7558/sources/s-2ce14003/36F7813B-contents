@@ -1,9 +1,0 @@
-rm(list=ls())
-path<-dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(path) 
-getwd()
-
-extracted <- readRDS("outputs/ukb_extracted.rds")
-
-coln <- colnames(extracted)
-coln

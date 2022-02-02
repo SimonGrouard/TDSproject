@@ -1,1 +1,0 @@
-mydata <- fread(here::here)
