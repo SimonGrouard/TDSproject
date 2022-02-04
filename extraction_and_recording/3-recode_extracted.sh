@@ -1,5 +1,5 @@
-#PBS -l walltime=5:00:00
-#PBS -l select=1:ncpus=1:mem=20gb
+#PBS -l walltime=24:00:00
+#PBS -l select=1:ncpus=1:mem=40gb
 #PBS -N recoding
 #PBS -q med-bio
 

@@ -1,5 +1,5 @@
 #PBS -l walltime=5:00:00
-#PBS -l select=1:ncpus=1:mem=30gb
+#PBS -l select=1:ncpus=1:mem=60gb
 #PBS -N extraction
 #PBS -q med-bio
 

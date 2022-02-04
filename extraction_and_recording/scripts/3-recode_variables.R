@@ -4,8 +4,8 @@
 library(openxlsx)
 
 # Loading outputs from previous steps
-choices <- readRDS("../outputs/annot.rds")
-mydata <- readRDS("../outputs/ukb_extracted.rds")
+choices <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/annot.rds")
+mydata <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/ukb_extracted.rds")
 
 # Initialising objects
 weird_recoding <- NULL
@@ -122,7 +122,7 @@ for (k in 1:nrow(choices)) {
 }
 
 # Preparing additional column information
-write.xlsx(choices, "../parameters/parameters.xlsx")
+write.xlsx(choices, "../parameters/parameters_main.xlsx")
 
 # Saving extracted dataset
-saveRDS(mydata, "../outputs/ukb_recoded.rds")
+saveRDS(mydata, "../outputs/ukb_recoded_main.rds")
