@@ -5,8 +5,8 @@ library(data.table)
 library(openxlsx)
 
 # Loading outputs from previous steps
-mydata <- readRDS("../outputs/ukb_recoded.rds")
-choices <- read.xlsx("../parameters/parameters.xlsx")
+mydata <- readRDS("../outputs/recoded/Exposures_covariates_recoded.rds")
+choices <- read.xlsx("../parameters/parameters_Exposures_covariates.xlsx")
 
 # Identifying variables with multiple arrays
 multiple_arrays_id <- grep(",", choices$ArrayList)
@@ -96,4 +96,4 @@ data_recoded=cbind(data_recoded, mydata[,grep("_continuous", colnames(mydata)), 
 mydata=data_recoded
 
 # Saving extracted dataset
-saveRDS(mydata, "../outputs/ukb_final.rds")
+saveRDS(mydata, "../outputs/final/Exposures_covariates_final.rds")

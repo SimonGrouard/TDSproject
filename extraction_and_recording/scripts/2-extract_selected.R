@@ -94,7 +94,7 @@ choices$FigureNameWithUnit[unit_ids] <- paste0(choices$FigureName[unit_ids], " (
 print(choices[,c("FieldID", "Coding")])
 
 # Preparing additional column information
-saveRDS(choices, "../outputs/annot.rds")
+saveRDS(choices, "../outputs/annot_main_extracted.rds")
 
 # Saving extracted dataset
-saveRDS(mydata, "../outputs/ukb_extracted.rds")
+saveRDS(mydata, "../outputs/ukb_main_extracted.rds")

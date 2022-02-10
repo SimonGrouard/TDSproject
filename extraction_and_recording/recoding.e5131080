@@ -1,0 +1,7 @@
+Loading anaconda3/personal
+  Loading requirement: fix_unwritable_tmp fix_setxattr
+Error in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  : 
+  line 7099 did not have 4 elements
+Calls: read.table -> scan
+In addition: There were 50 or more warnings (use warnings() to see the first 50)
+Execution halted

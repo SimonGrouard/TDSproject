@@ -4,8 +4,8 @@
 library(openxlsx)
 
 # Loading outputs from previous steps
-choices <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/annot.rds")
-mydata <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/ukb_extracted.rds")
+choices <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/annot_Exposures_covariates_extracted.rds")
+mydata <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/Exposures_covariates_extracted.rds")
 
 # Initialising objects
 weird_recoding <- NULL
@@ -50,9 +50,14 @@ for (k in 1:ncol(mydata)) {
     }
   }
 
+  #if (grepl("date", tolower(choices[tmp_coding_name, "ValueType"]))) {
+    # Recoding for dates
+  # recoded_data[, k] <- as.Date(recoded_data[, k], origin = "1970-01-01")
+  #}
+  
   if (grepl("date", tolower(choices[tmp_coding_name, "ValueType"]))) {
     # Recoding for dates
-    recoded_data[, k] <- as.Date(recoded_data[, k], origin = "1970-01-01")
+    recoded_data[, k] <- as.Date(recoded_data[, k], format = "%Y-%m-%d")
   }
 
   if (tolower(choices[tmp_coding_name, "ValueType"]) %in% c("time", "text", "compound")) {
@@ -122,7 +127,7 @@ for (k in 1:nrow(choices)) {
 }
 
 # Preparing additional column information
-write.xlsx(choices, "../parameters/parameters_main.xlsx")
+write.xlsx(choices, "../parameters/parameters_Exposures_covariates.xlsx")
 
 # Saving extracted dataset
-saveRDS(mydata, "../outputs/ukb_recoded_main.rds")
+saveRDS(mydata, "../outputs/Exposures_covariates_recoded.rds")

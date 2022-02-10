@@ -1,0 +1,3 @@
+Loading anaconda3/personal
+  Loading requirement: fix_unwritable_tmp fix_setxattr
+Note: zip::zip() is deprecated, please use zip::zipr() instead

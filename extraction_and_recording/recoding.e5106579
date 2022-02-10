@@ -1,6 +1,0 @@
-Loading anaconda3/personal
-  Loading requirement: fix_unwritable_tmp fix_setxattr
-Error in charToDate(x) : 
-  character string is not in a standard unambiguous format
-Calls: as.Date -> as.Date.character -> charToDate
-Execution halted
