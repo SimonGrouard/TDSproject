@@ -6,7 +6,7 @@ library(openxlsx)
 
 # Loading outputs from previous steps
 mydata <- readRDS("../outputs/recoded/Exposures_covariates_recoded.rds")
-choices <- read.xlsx("../parameters/parameters_Exposures_covariates.xlsx")
+choices <- read.xlsx("../parameters/parameters_Exposures_edit.xlsx")
 
 # Identifying variables with multiple arrays
 multiple_arrays_id <- grep(",", choices$ArrayList)

@@ -1,5 +1,0 @@
-Loading anaconda3/personal
-  Loading requirement: fix_unwritable_tmp fix_setxattr
-Error in colnames(data_recoded)[ncol(data_recoded)] <- colnames(mydata)[column_ids] : 
-  replacement has length zero
-Execution halted
