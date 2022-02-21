@@ -3,8 +3,8 @@ exposures_recoded <- readRDS(here::here('extraction_and_recording/outputs/recode
 exposures_extracted <- readRDS(here::here('extraction_and_recording/outputs/Exposures_covariates_extracted.rds'))
 test_recoded <- exposures_recoded
 test_extracted <- exposures_extracted
-variables <- c('CancerFirst', 'NonCancerFirst', 'OpFirst', 'FTEduAge', 'NDay10+minWlk', 'NDayModPhys10+min',
-               'NDayModPhys10+min', 'NDayVigPhys10+min', 'SleepDur', 'HomeSmokeExp', 'OutHomeSmokeExp',
+variables <- c('CancerFirst', 'NonCancerFirst', 'OpFirst', 'FTEduAge', 'NDay10minWlk', 'NDayModPhys10min',
+               'NDayVigPhys10min', 'SleepDur', 'HomeSmokeExp', 'OutHomeSmokeExp',
                'MumAge', 'NChildFath', 'NLiveBirth', 'FirstChldBW', 'FirstLiveBirthAge', 'LastLiveBirthAge',
                'FormSmokAgeStart', 'NCigPrevSmokeDay', 'AgeSmokEnd', 'NUnsuccSmokStop', 'FatherAge', 'AgeStartSmokCurr',
                'NCigCurrSmok', 'YrImmigratUK', 'StillBirths', 'SponMiscarr', 'PregTermination', 'DepressLongest', 'DepressEpi',
@@ -22,7 +22,7 @@ variables_to_combine_recoded[is.na(variables_to_combine_recoded)] <- variables_t
 
 test_recoded[, all_variable_names] <- variables_to_combine_recoded[, all_variable_names]
 
-saveRDS(test_recoded, "extraction_and_recording/outputs/recoded/Exposures_covariates_recoded_combined.rds")
+saveRDS(test_recoded, "../outputs/recoded/Exposures_covariates_recoded_combined.rds")
 
 
 # combined_recoded <- test_recoded[, !grepl(paste(variables, collapse='|'),

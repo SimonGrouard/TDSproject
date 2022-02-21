@@ -18,7 +18,7 @@ args <- commandArgs(trailingOnly = TRUE)
 ukb_path <- as.character(args[1])
 
 # Loading xlsx file with selections
-choices <- read.xlsx("../parameters/selection_group6-2_main.xlsx")
+choices <- read.xlsx("../parameters/data_groups/Exposures_covariates.xlsx")
 
 # Printing message
 print(paste0("N=", sum(!is.na(choices$CodingName)), " field IDs have been selected for extraction:"))
@@ -94,7 +94,7 @@ choices$FigureNameWithUnit[unit_ids] <- paste0(choices$FigureName[unit_ids], " (
 print(choices[,c("FieldID", "Coding")])
 
 # Preparing additional column information
-saveRDS(choices, "../outputs/annot_main_extracted.rds")
+saveRDS(choices, "../outputs/annot_Exposures_covariates_extracted.rds")
 
 # Saving extracted dataset
-saveRDS(mydata, "../outputs/ukb_main_extracted.rds")
+saveRDS(mydata, "../outputs/Exposures_covariates_extracted.rds")

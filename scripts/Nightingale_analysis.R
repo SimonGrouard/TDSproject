@@ -5,7 +5,9 @@ suppressPackageStartupMessages(library(ggfortify))
 install.packages('glmnet')
 suppressPackageStartupMessages(library(glmnet))
 
-df <- data.frame(Nightingale_metabolomics_recoded)
+nightingale <- readRDS('../extraction_and_recording/outputs/final/Nightingale_metabolomics_final.rds')
+Genomics_data_recoded <- readRDS('../extraction_and_recording/outputs/final/Genomics_data_final.rds')
+
 genomics <- data.frame(Genomics_data_recoded)
 df$TSR <- genomics$AdjTSRatio.0.0
 pval <- rep(0,ncol(df_new)) 
@@ -62,18 +64,5 @@ legend("top", pch = 19, col = c("navy", "skyblue"),
 sum(!cumsum(ev)>0.9)
 #only three principal components are needed to explain 90% of the variance
 
-#distribution of Telomere length variable
-summary(df_new$TSR)
-##appears there are some high outliers as third quartile is 0.9077 but max is 5.36
-(table(df_new$TSR>1))
-#1 person with TSR bigger than 5, 1 person between 4-5, 3 people between 3-4, 7 people between 2-3, over 1000 between 1-2
 
-ggplot(df_new, aes(x = TSR )) +
-  geom_density()
-
-fil <- df_new %>% filter(TSR >0.9077)
-plot(density(fil$TSR))
-
-fil2 <- df_new %>% filter(TSR > 2)
-plot(density(fil2$TSR))
 

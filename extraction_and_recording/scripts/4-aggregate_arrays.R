@@ -5,8 +5,19 @@ library(data.table)
 library(openxlsx)
 
 # Loading outputs from previous steps
-mydata <- readRDS("../outputs/recoded/Exposures_covariates_recoded.rds")
-choices <- read.xlsx("../parameters/parameters_Exposures_edit.xlsx")
+mydata <- readRDS("../outputs/recoded/Exposures_covariates_recoded_combined.rds")
+choices <- read.xlsx("../parameters/parameters_Exposures_covariates.xlsx")
+
+# # Renaming columns
+# mydata <- mydata %>%
+#   rename(
+#     "Nday10minWlk.0.0" = "NDay10+minWlk.0.0",
+#     "NDayModPhys10min.0.0" = "NDayModPhys10+min.0.0",
+#     "NDayVigPhys10min.0.0" = "NDayVigPhys10+min.0.0"
+#   )
+# drops <- c("Nday10minWlk.0.0", "NDayModPhys10min.0.0", "NDayVigPhys10min.0.0")
+# keeps <- mydata[, c(grep("Qualifications", colnames(mydata)))]
+# mydata <- keeps
 
 # Identifying variables with multiple arrays
 multiple_arrays_id <- grep(",", choices$ArrayList)
@@ -65,7 +76,7 @@ for (i in 1:nrow(choices)) {
 
         # Transforming back to factor if needed
         if (factor_variable) {
-          data_recoded[, ncol(data_recorded)] <- factor(data_recoded[, ncol(data_recorded)], levels = mylevels)
+          data_recoded[, ncol(data_recoded)] <- factor(data_recoded[, ncol(data_recoded)], levels = mylevels)
         }
       }
       if (choices[i, "ArrayMethod"] == 5) {

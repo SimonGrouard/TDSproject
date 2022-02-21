@@ -24,6 +24,13 @@ AgeAdjTS <- extracted %>%
   filter_at(vars(AgeAssess.0.0,AdjTSRatio.0.0),all_vars(!is.na(.)))
 dim(AgeAdjTS)
 
+# Run these lines to exclude outliers (> 1.5 times IQR)
+Q <- quantile(AgeAdjTS$AdjTSRatio.0.0, probs=c(.25, .75), na.rm = T)
+iqr <- IQR(AgeAdjTS$AdjTSRatio.0.0, na.rm = T)
+
+AgeAdjTS <- AgeAdjTS %>% filter(AdjTSRatio.0.0 > (Q[1] - 1.5*iqr) & 
+                                  AdjTSRatio.0.0 < (Q[2] + 1.5*iqr))  
+dim(AgeAdjTS)
 # Explanatory analysis before filtering observations
 a.1<-extracted %>% #histogram for telomere length
   filter(AdjTSRatio.0.0 < 1.5,
@@ -143,4 +150,7 @@ reg2 <- ggplot(AgeZadjTS, aes(x = AgeAssess.0.0, y = ZadjTSRatio.0.0)) +
   stat_smooth(method = "lm", col = "red")
 
 ggsave("age_Ztelomere_regression.png", plot = reg2)
+
+
+
 
