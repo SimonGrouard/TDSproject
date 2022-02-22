@@ -1,10 +1,14 @@
-args=commandArgs(trailingOnly=TRUE)
-nchunks=as.numeric(args[1])
-ichunk=as.numeric(args[2])
+suppressMessages(library(tidyverse))
 
-rm(list=ls())
-path=dirname(rstudioapi::getActiveDocumentContext()$path)
-setwd(path)
+## Parameters
+
+args=commandArgs(trailingOnly=TRUE)
+data_path=toString(args[1])
+nchunks=as.numeric(args[2])
+ichunk=as.numeric(args[3])
+
+
+## Loading packages and data
 
 nightingale <- readRDS('../extraction_and_recording/outputs/final/Nightingale_metabolomics_final.rds')
 Genomics_data_recoded <- readRDS('../extraction_and_recording/outputs/final/Genomics_data_final.rds')
@@ -27,22 +31,17 @@ df_new <- df_new %>% select(-contains("HLactate"))
 df_new <- df_new %>% select(-contains("HPyruvate"))
 df_new <- df_new %>% select(-contains("LGlucose"))
 df_new <- df_new %>% select(-contains("LProtein"))
+#removing further NA values
 df_new <- na.omit(df_new)
 
 ##running univariate analysis 
-get_pvalues = function(X) {
-  model0 <- lm(X ~ 1, data = df_new)
-  model1 <- lm(X ~ exposure, data = df_new)
-  pval <- anova(model0, model1)$`Pr(>F)`[2]
-  return(pval)
+pval <- rep(0,ncol(df_new)) 
+for (j in 1:ncol(df_new)){
+  model <- lm(TSR~.,data=df_new[,c(j,ncol(df_new))])
+  coefs <- summary(model)$coefficients
+  pval[j] <- coefs[2,'Pr(>|t|)']
 }
 
-ids=as.character(cut(1:ncol(df_new), breaks = nchunks, labels = 1:nchunks))
-
-t0=Sys.time()
-pvalues = apply(df_new[,ids==ichunk], 2, FUN = get_pvalues)
-t1=Sys.time()
-print(t1-t0)
-
+pvalues <- cbind(colnames(df_new), pval)
 ifelse(dir.exists("Results_nightingale_univ"),"",dir.create("Results_nightingale_univ"))
 saveRDS(pvalues, paste0("Results_nightingale_univ/univ_pval_nightingale_", ichunk, ".rds"))

@@ -33,6 +33,14 @@ for (j in 1:ncol(df_new)){
   pval[j] <- coefs[2,'Pr(>|t|)']
 }
 
+##get_pvalues = function(X) {
+ # model0 <- lm(X ~ 1, data = df_new)
+#  model1 <- lm(X ~ , data = df_new)
+#  pval <- anova(model0, model1)$`Pr(>F)`[2]
+#  return(pval)
+}
+
+
 plot(-log10(pval[1:ncol(df_new)]),pch=16,ylab="-log(p-values)",xlab="TS Ratio") # Manhattan plot
 abline(h=-log10(0.05/ncol(df_new)), col='red',lty=2) # p-val = 0.05/p 
 colnames(df_new[pval<=0.05/ncol(df_new)])
