@@ -3,7 +3,7 @@
 #PBS -N sevnodes1core
 #PBS -J 1-24
 
-cd /rds/general/project/hda_21-22/live/TDS/Group_6/scripts
+cd /rds/general/project/hda_21-22/live/TDS/Group_6/scripts/univariate_exposures
 module load anaconda3/personal
 
 data_path=/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/recoded/

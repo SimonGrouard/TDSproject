@@ -10,4 +10,4 @@ data_path=/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recordi
 ichunk=$PBS_ARRAY_INDEX
 nchunks=24
 
-Rscript Nightingale_univariate_analysis.R $data_path $nchunks $ichunk
+Rscript Biomarker_univariate_analysis.R $data_path $nchunks $ichunk

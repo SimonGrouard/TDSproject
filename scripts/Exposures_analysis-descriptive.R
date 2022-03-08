@@ -45,7 +45,6 @@ dev.off()
 tNA_Exposure <- as.data.frame(t(NA_Exposure))
 df_lessNA_var <- as.data.frame(subset(tNA_Exposure, NAnumber<= 300000)) 
 # 146 of the 817 variables remained
-library(dplyr)
 df_lessNA <- full_df %>% select(colnames = rownames(df_lessNA_var))
 colnames(df_lessNA) <- rownames(df_lessNA_var)
 lessNA_Exposure <- as.data.frame(colSums(is.na(df_lessNA)))
@@ -62,7 +61,6 @@ dev.off()
 tNA_Exposure <- as.data.frame(t(NA_Exposure))
 df_lessNA_var <- as.data.frame(subset(tNA_Exposure, NAnumber<= 200000)) 
 # 128 of the 817 variables remained
-library(dplyr)
 df_lessNA <- full_df %>% select(colnames = rownames(df_lessNA_var))
 colnames(df_lessNA) <- rownames(df_lessNA_var)
 lessNA_Exposure <- as.data.frame(colSums(is.na(df_lessNA)))
@@ -79,7 +77,6 @@ dev.off()
 tNA_Exposure <- as.data.frame(t(NA_Exposure))
 df_lessNA_var <- as.data.frame(subset(tNA_Exposure, NAnumber<= 100000)) 
 # 122 variables remained
-library(dplyr)
 df_lessNA <- full_df %>% select(colnames = rownames(df_lessNA_var))
 colnames(df_lessNA) <- rownames(df_lessNA_var)
 lessNA_Exposure <- as.data.frame(colSums(is.na(df_lessNA)))
@@ -93,7 +90,7 @@ barplot(as.matrix(lessNA_Exposure), names.arg = names(lessNA_Exposure), las = 2,
 dev.off()
 
 ## NA pattern visualisation
-library(naniar)
+suppressPackageStartupMessages(library(naniar))
 pdf("NA_Exposure_pattern.pdf", 30, 21)
 vis_miss(df_lessNA, cluster= T, sort_miss = T, warn_large_data = F)
 dev.off()

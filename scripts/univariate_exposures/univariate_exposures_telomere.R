@@ -10,11 +10,12 @@ ichunk=as.numeric(args[3])
 
 ## Loading packages and data
 
-expo_path <- paste(data_path,"Exposures_covariates_recoded_combined.rds",sep="")
+expo_path <- paste(data_path,"Exposures_covariates_recoded_combined_final.rds",sep="")
 output_path <- paste(data_path,"Genomics_data_recoded.rds",sep="")
 
 expo<-readRDS(expo_path)
 tel_length<-readRDS(output_path)["AdjTSRatio.0.0"]
+
 
 ## Running univariate models
 
@@ -60,21 +61,33 @@ convert_type <- function(df, colname){
   return(df)
 }
 
+
+tel_length <- data.frame(age = expo$AgeAssess, sex = expo$Sex, AdjTSRatio = tel_length$AdjTSRatio.0.0)
+expo <- expo %>% select(-one_of('AgeAssess', 'Sex')) # we remove AgeAssess and Sex_female so they are used as variate
 get_pvalues = function(X) {
-  df <- data.frame(exposure = X, AdjTSRatio = tel_length$AdjTSRatio.0.0) %>% drop_na()
+  df <- data.frame(exposure = X, tel_length) %>% drop_na()
   # data.frame converts columns which contain characters to factors
   # this allows us to then convert them to numeric or integers if needed, in the following convert_type function
   
-  if (dim(df)[1] < 100 | (is.factor(df$exposure) && length(levels(droplevels(df$exposure))) < 2)){ 
+  ## To remove the outliers
+  Q <- quantile(df$AdjTSRatio, probs=c(.25, .75), na.rm = T)
+  iqr <- IQR(df$AdjTSRatio, na.rm = T)
+  df <- df %>% filter(AdjTSRatio > (Q[1] - 1.5*iqr) & 
+                      AdjTSRatio < (Q[2] + 1.5*iqr))  
+  
+  if (dim(df)[1] < 100 | (is.factor(df$exposure) && length(levels(droplevels(df$exposure))) < 2) | length(table(df[['exposure']])) == 1){ 
     # && doesn't read the second part of the statement is the first one is not fulfilled, contrary to &
     # we need that because droplevels outputs an error if not factor
     return(1) # too many NAs or not enough categories, so we just return a non significant pval
   }
-  
   df <- convert_type(df, "exposure")
+
+  if (length(table(droplevels(df)$sex)) < 2){ # if, after converting and dropping na, only one gender is represented
+    return(1)
+  }
   
-  model0 <- lm(AdjTSRatio ~ 1, data = df)
-  model1 <- lm(AdjTSRatio ~ exposure, data = df)
+  model0 <- lm(AdjTSRatio ~ age + sex, data = df)
+  model1 <- lm(AdjTSRatio ~ exposure + age + sex, data = df)
   pval <- anova(model0, model1)$`Pr(>F)`[2]
   return(pval)
 }
@@ -85,5 +98,6 @@ pvalues = apply(expo[,ids==ichunk], 2, FUN = get_pvalues)
 t1=Sys.time()
 print(t1-t0)
 
-ifelse(dir.exists("../Results_univariate_exposures"),"",dir.create("../Results_univariate_exposures"))
-saveRDS(pvalues, paste0("../Results_univariate_exposures/univ_exposures_", ichunk, ".rds"))
+ifelse(dir.exists("../../Results_univariate_exposures/not_onehotencode_adjusted"),"",dir.create("../../Results_univariate_exposures/not_onehotencode_adjusted"))
+saveRDS(pvalues, paste0("../../Results_univariate_exposures/not_onehotencode_adjusted/univ_exposures_no_outliers_", ichunk, ".rds"))
+
