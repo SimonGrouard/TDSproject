@@ -106,10 +106,10 @@ results <- results %>%
 
 
 # Volcano plot ------------------------------------------------------------
-## no one hot encoding_unadjusted
-## no one hot encoding_withoutadjusted
-## one hot encoding_unadjusted
-## one hot encoding_withoutadjusted
+## no one-hot encoding_unadjusted
+## no one-hot encoding_withoutadjusted
+## one-hot encoding_unadjusted
+## one-hot encoding_withoutadjusted
 
 
 ## x: beta coefs, y: -log10(p_val)

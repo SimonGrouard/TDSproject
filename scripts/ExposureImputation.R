@@ -13,7 +13,7 @@ ichunk=as.numeric(args[3])
 
 # Loading data after onehot encoding
 data <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/recoded/Exposures_covariates_recoded_combined_final_onehot.rds")
-df <- data[, which(colMeans(!is.na(data)) < 0.8)] # drop variables with NA proportions > 80%
+df <- data[, which(colMeans(!is.na(data)) < 0.5)] # drop variables with NA proportions > 50%
 
 # imputation
 imputedDf <- impute.knn(df, k = 10, rowmax = 0.5, colmax = 0.8, maxp = 1500, rng.seed=362436069)
