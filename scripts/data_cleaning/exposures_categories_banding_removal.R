@@ -131,9 +131,22 @@ exposures_rm <- exposures[ , ! names(exposures) %in% c("MOB", "BirthWKnow",'LTFU
 # exposures_rm[exposures_rm == "Prefer not to answer"] <- NA
 
 # Using apply with removing_na function to replace strings with NAs as well as remove them as factors
-exposures_rm_incl_na <- apply(exposures_rm, 2, removing_na)
+exposures_rm_incl_na <- lapply(exposures_rm, removing_na)
 exposures_rm_incl_na <- data.frame(exposures_rm_incl_na)
-# saveRDS(exposures_rm_incl_na, here::here("extraction_and_recording/outputs/recoded/checkpoint_rebanding.rds"))
+exposures_rm_incl_na <- lapply(exposures_rm_incl_na_test, function(x) {if(is.factor(x)) factor(x) else x})
+exposures_rm_incl_na <- data.frame(exposures_rm_incl_na)
+
+# exposures_rm_incl_na_test <- exposures_rm_incl_na
+# # attr(exposures_rm_incl_na_test$AccomType, "ATT") <- NULL
+# # 
+# # 
+# # exposures_rm_incl_na_test <- apply(exposures_rm_incl_na_test, 2, function(x) { attr(x, "ATT") <- NULL })
+# # data.frame(exposures_rm_incl_na_test)
+# # attr(exposures_rm_incl_na, "names") <- NULL
+# exposures_rm_incl_na_test <- lapply(exposures_rm_incl_na_test, function(x) {if(is.factor(x)) factor(x) else x})
+# exposures_rm_incl_na_test <- data.frame(exposures_rm_incl_na_test)
+
+saveRDS(exposures_rm_incl_na, here::here("extraction_and_recording/outputs/recoded/checkpoint_rebanding.rds"))
 
 
 # Special Cases ------------------------------------------

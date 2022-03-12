@@ -43,38 +43,33 @@ y= bio_fin$AdjTSRatio
 set.seed(1)
 model.lasso <- cv.glmnet(x = x, y = y, alpha = 1)
 
+betas=coef(model.lasso, s='lambda.1se')[-1]
+names(betas)=rownames(coef(model.lasso))[-1]
 
-#Stability analysis-----------------------
-LassoSub = function(k=1, Xdata, Ydata, family="gaussian", penalty.factor=NULL) {
-  if (is.null(penalty.factor)){
-    penalty.factor=rep(1,ncol(Xdata))
-  }
-  set.seed(k)
-  s = sample(nrow(Xdata), size = 0.8 * nrow(Xdata))
-  Xsub = Xdata[s, ]
-  Ysub = Ydata[s]
-  model.sub = cv.glmnet(x = Xsub, y = Ysub, alpha = 1, family=family, penalty.factor=penalty.factor)
-  coef.sub = coef(model.sub, s = "lambda.1se")[-1]
-  return(coef.sub)
-}
+#pdf('lasso_plot.pdf')
+#plot(model.lasso)
+#dev.off()
 
-niter=100
-lasso.stab=sapply(1:niter, FUN=LassoSub, Xdata=x, Ydata=y)
+best_lam <- model.lasso$lambda.1se
+best_model <- glmnet(x = x, 
+                     y = y, lambda = best_lam)
 
-apply(lasso.stab, 2, FUN=function(x){sum(x!=0)})
+table(coef(model.lasso, s='lambda.1se')[-1]!=0)
+betas_2=coef(best_model, s='lambda.1se')[-1]
+names(betas_2)=rownames(coef(best_model, s='lambda.1se'))[-1]
 
-lasso.prop=apply(lasso.stab, 1, FUN=function(x){sum(x!=0)/length(x)})
-names(lasso.prop)=colnames(x)
+#pdf('lasso_plot_best.pdf')
+#plot(best_model)
+#dev.off
 
-lasso.prop=sort(lasso.prop, decreasing = TRUE)
+#saveRDS(betas, '/rds/general/project/hda_21-22/live/TDS/Group_6/scripts/Norm_biomarkers/lasso_bio_pt1_3.rds')
+#saveRDS(betas_2, '/rds/general/project/hda_21-22/live/TDS/Group_6/scripts/Norm_biomarkers/lasso_bio_pt1_2.rds')
 
-pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/scripts/Norm_biomarkers/plot_prop.pdf')
-plot(lasso.prop[lasso.prop>0.2], type = 'h', col='navy', lwd=3, xaxt='n', 
-     xlab='', ylab=expression(beta), ylim=c(0,1.2), las=1)
-text(lasso.prop[lasso.prop>0.2]+0.07, labels = names(lasso.prop[lasso.prop>0.2]), 
-     pos=3, srt=90, cex=0.7)
-dev.off()
+#plotting beta values-----------------------
 
-saveRDS(lasso.prop, '/rds/general/project/hda_21-22/live/TDS/Group_6/scripts/Norm_biomarkers/lasso_prop.rds')
-
-
+#'best' lambda beta values
+#pdf('Beta_plot.pdf')
+#plot(lasso_bio_pt1_2[lasso_bio_pt1_2!=0], type = 'h', col='navy', lwd=2, xaxt='n', xlab='', ylab='Beta')
+#axis(side = 1, at = 1:sum(lasso_bio_pt1_2!=0), labels = names(lasso_bio_pt1_2)[lasso_bio_pt1_2!=0], las=2, cex.axis = 0.5)
+#abline(h=0, lty=2)
+#dev.off()

@@ -18,6 +18,8 @@ tel_length<-readRDS(output_path)["AdjTSRatio.0.0"]
 
 tel_length <- data.frame(age = expo$AgeAssess, sex = expo$Sex_Female, AdjTSRatio = tel_length$AdjTSRatio.0.0)
 expo <- expo %>% select(-one_of('AgeAssess', 'Sex_Female')) # we remove AgeAssess and Sex_female so they are used as variate 
+
+
 ## Running univariate models
 get_pvalues = function(X) {
   df <- data.frame(exposure = X, tel_length) %>% drop_na()
@@ -44,6 +46,6 @@ pvalues = apply(expo[,ids==ichunk], 2, FUN = get_pvalues)
 t1=Sys.time()
 print(t1-t0)
 
-ifelse(dir.exists("../../Results_univariate_exposures"),"",dir.create("../../Results_univariate_exposures"))
-saveRDS(pvalues, paste0("../../Results_univariate_exposures/univ_exposures_no_outliers_", ichunk, ".rds"))
+ifelse(dir.exists("../../Results_univariate_exposures/hotencoded_adjusted"),"",dir.create("../../Results_univariate_exposures/hotencoded_adjusted"))
+saveRDS(pvalues, paste0("../../Results_univariate_exposures/hotencoded_adjusted/univ_exposures_no_outliers_", ichunk, ".rds"))
 

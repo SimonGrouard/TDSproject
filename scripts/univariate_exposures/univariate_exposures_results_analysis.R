@@ -1,7 +1,7 @@
 suppressMessages(library(tidyverse))
 suppressMessages(library(RColorBrewer))
 
-results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/not_onehotencode_adjusted/"
+results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/hotencoded_adjusted/"
 
 ## results from the analysis
 get_results <- function(path, results){
@@ -141,7 +141,7 @@ random_rows %>%
   geom_point(aes(x=1:dim(random_rows)[1],y=log_pval), colour = "blue") +
   geom_point(data=random_rows[random_rows$pval<=0.05/dim(random_rows)[1],], aes(x=which(random_rows$pval<=0.05/dim(random_rows)[1]), y=log_pval), colour="red") + # color the significative points
   geom_hline(yintercept=-log(0.05/dim(random_rows)[1]), linetype="dashed", color = "red") +
-  ggtitle("All p_values, by group, with a Bonferroni correction: analysis without the outliers")+
+  ggtitle("Univariate exposures, one hot encoded, adjusted for age and sex, without outliers")+
   xlab("")+
   ylab("-log(p_values)")+
   facet_wrap(~ group)
@@ -150,7 +150,7 @@ results %>%
   ggplot() +
   geom_point(aes(x=1:dim(results)[1],y=log_pval, colour = group)) +
   geom_hline(yintercept=-log(0.05/dim(results)[1]), linetype="dashed", color = "red") +
-  ggtitle("All p_values, coloured by group, with a Bonferroni correction: analysis without the outliers")+
+  ggtitle("Univariate exposures, one hot encoded, adjusted for age and sex, without outliers")+
   xlab("")+
   ylab("-log(p_values)")
 
