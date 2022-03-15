@@ -14,19 +14,12 @@ data_path=toString(args[1])
 nchunks=as.numeric(args[2])
 ichunk=as.numeric(args[3])
 
-# Data --------------------------------------------------------------------
-telomere_length <- readRDS(here::here("extraction_and_recording/outputs/recoded/Genomics_data_recoded.rds"))
-exposures <- readRDS(here::here("extraction_and_recording/outputs/recoded/Exposures_covariates_recoded_combined_final.rds")) # dataset name to be confirmed
-test_telomere <- head(telomere_length, 1000)
-test_exposures <- head(exposures, 1000)
+df <- readRDS('/rds/general/project/hda_21-22/live/TDS/Group_6/Results_multivariate_exposures/dataForlasso.rds')
 
-## Adding telomere length variable to exposure dataframe
-exposures_telomere <- exposures %>%
-  mutate(AdjTSRatio = telomere_length$AdjTSRatio.0.0,
-         ZAdjTSRatio = telomere_length$ZAdjTSRatio.0.0)
-test_exposures_telomere <- head(exposures_telomere, 1000)
-
-## Removal of NAs: will be handled by imputation
+## test with first 1000 rows
+test_df <- as.matrix(head(df, 1000))
+X = test_df[,1:169]
+Y = test_df[,170]
 
 
 # Analysis ----------------------------------------------------------------
@@ -34,56 +27,51 @@ test_exposures_telomere <- head(exposures_telomere, 1000)
 ## LASSO Models
 set.seed(10)
 t0 = Sys.time()
-lasso_model <- cv.glmnet(x = test_exposures, 
-                         y = test_telomere$AdjTSRatio.0.0, alpha = 1)
+lasso_model <- cv.glmnet(x = X, 
+                         y = Y, alpha = 1)
 t1 = Sys.time()
 print(t1-t0)
 
 plot(lasso_model)
 
 ## Regularization Path
-lasso_path = glmnet(x = test_exposures, y = test_telomere$AdjTSRatio.0.0, alpha = 1)
+lasso_path = glmnet(x = X, y = Y, alpha = 1)
 plot(lasso_path)
 
 ## get lambda min and lambda.1se
-lasso_model$lambda.min
-lasso_model$ lambda.1se
+lasso_model$lambda.min # 0.0086
+lasso_model$ lambda.1se # 0.0240
 
 ## final model
-best_lam <- model_lasso$lambda.1se # in case of including too many variables
-best_model <- glmnet(x = test_exposures, 
-                     y = test_telomere$AdjTSRatio.0.0, lambda = best_lam)
+best_lam <- lasso_model$lambda.min # if use 1se, all beta_coefs will be 0
+best_model <- glmnet(x = X, y = Y, lambda = best_lam)
+lambda1se_model <- glmnet(x = X, y = Y, lambda = lasso_model$ lambda.1se)
 
 ## selected exposure variables
-table(coef(best_model,"lambda.1se"))[2:ncol(test_exposures)+1,]
-beta_lasso = coef(best_model, s = "lambda.1se")[2:ncol(test_exposures)+1,]
-selected_lasso = names(beta_lasso)[which(beta_lasso != 0)]
-print(paste0(length(selected_lasso)), " exposures are selected")
+beta_lasso = matrix(coef(best_model, s = "lambda.1se")[-1], ncol = 169)
+colnames(beta_lasso) <- colnames(X)
+selected_lasso = colnames(beta_lasso)[which(beta_lasso != 0)]
 print(selected_lasso)
 
 ## visualise selected variables with their non-zero beta coefficients
-plot(beta_lasso[best_lasso != 0],type = "h", col = "navy", lwd = 3,
+plot(beta_lasso[beta_lasso != 0],type = "h", col = "navy", lwd = 3,
      xaxt = "n", xlab = "", ylab = expression(best_lasso))
 axis(side = 1, at = 1:sum(best_lasso != 0), labels = selected_lasso, las = 2)
 abline(h = 0, lty = 2)
 
-## colnames and rownames
-colnames(lassomodels) = colnames(lassomodels.1se) = colnames(test_exposures)
-rownames(lassomodels) = rownames(lassomodels.1se) = colnames(test_telomere$AdjTSRatio.0.0)
 
 # save the lasso models ---------------------------------------------------
-
-ifelse(dir.exists("/rds/general/project/hda_21-22/live/TDS/Group_6/Results_Lasso_Exposure"),"",dir.create("/rds/general/project/hda_21-22/live/TDS/Group_6/Results_Lasso_Exposure"))
-saveRDS(lasso_models, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_Lasso_Exposure/lasso_min.rds")
-saveRDS(best_model, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_Lasso_Exposure/lasso_1se.rds")
+saveRDS(lasso_model, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_multivariate_exposures/Lasso/lasso_model.rds")
+saveRDS(lambda1se_model, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_multivariate_exposures/Lasso/lasso_1se.rds")
+saveRDS(best_model, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_multivariate_exposures/Lasso/lasso_min.rds")
 
 
 # Stability Selection -----------------------------------------------------
 
 ## running analysis
 t0 = Sys.time()
-out = VariableSelection(xdata = test_exposures, ydata = test_telomere$AdjTSRatio.0.0, 
-                        verbose = F, penalty.factor = c(rep(1, ncol(test_exposures))),
+out = VariableSelection(xdata = X, ydata = Y, 
+                        verbose = F, penalty.factor = c(rep(1, ncol(X))),
                         family = "gaussian")
 t1 = Sys.time()
 print(t1-t0)
@@ -125,3 +113,33 @@ for (i in 1:length(selprop)){
 }
 
 ## Univariate vs. Multivariate
+
+## traditional stability selection
+#Stability analysis-----------------------
+LassoSub = function(k=1, Xdata, Ydata, family="gaussian", penalty.factor=NULL) {
+  if (is.null(penalty.factor)){
+    penalty.factor=rep(1,ncol(Xdata))
+  }
+  set.seed(k)
+  s = sample(nrow(Xdata), size = 0.8 * nrow(Xdata))
+  Xsub = Xdata[s, ]
+  Ysub = Ydata[s]
+  model.sub = cv.glmnet(x = Xsub, y = Ysub, alpha = 1, family=family, penalty.factor=penalty.factor)
+  coef.sub = coef(model.sub, s = "lambda.1se")[-1]
+  return(coef.sub)
+}
+
+niter=100
+lasso.stab=sapply(1:niter, FUN=LassoSub, Xdata=X, Ydata=Y)
+
+apply(lasso.stab, 2, FUN=function(x){sum(x!=0)})
+
+lasso.prop=apply(lasso.stab, 1, FUN=function(x){sum(x!=0)/length(x)})
+names(lasso.prop)=colnames(X)
+
+lasso.prop=sort(lasso.prop, decreasing = TRUE)
+plot(lasso.prop[lasso.prop > 0], type = "h", col = "navy",
+     lwd = 3, xaxt = "n", xlab = "", ylab = expression(beta),
+     ylim = c(0, 1.2), las = 1)
+text(lasso.prop[lasso.prop > 0.2] + 0.07, labels = names(lasso.prop[lasso.prop >
+                                                                      0.2]), pos = 3, srt = 90, cex = 0.7)

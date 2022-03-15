@@ -1,17 +1,11 @@
 ## load packages
+suppressMessages(library(dplyr))
 suppressMessages(library(tidyverse))
 suppressMessages(library(RColorBrewer))
 suppressMessages(library(ggplot2))
+suppressMessages(library(ggrepel))
 
-## Parameters
-args=commandArgs(trailingOnly=TRUE)
-data_path=toString(args[1])
-nchunks=as.numeric(args[2])
-ichunk=as.numeric(args[3])
-
-# get results of p_values -------------------------------------------------
-
-results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/"
+results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/hotencoded_adjusted_volcano/"
 
 ## results from the analysis
 get_results <- function(path, results){
@@ -19,18 +13,30 @@ get_results <- function(path, results){
   return(results)
 }
 
-results <- readRDS(paste0(results_path, list.files(results_path)[1])) # change 25 by 1 if with outliers
-for (i in 2:24){ # change 26 by 2, and length by 24 if with outliers
+results <- readRDS(paste0(results_path, list.files(results_path)[1]))
+for (i in 2:length(list.files(results_path))){ 
   results <- get_results(list.files(results_path)[i], results)
 }
 
 length(results)
 
-results <- data.frame(pval = results) %>% 
-  mutate(bonf = ifelse(pval <= 0.05/dim(.)[1],1,0))
+pval = numeric()
+for (i in 1:length(results))
+  pval <- as.matrix(unlist(c(pval,results[[i]][1])))
+print(pval)
+  
+beta_coef = numeric()
+for (i in 1:length(results))
+  beta_coef <- as.matrix(unlist(c(beta_coef,results[[i]][2])))
+print(beta_coef)
 
-print(paste0(round(sum(results$bonf)*100/length(results$bonf)), "%")) # proportion significative
-print(sum(results$bonf))
+new_results <- data.frame(cbind(pval, beta_coef)) %>% 
+  mutate(bonf = ifelse(pval <= 0.05/dim(.)[1],1,0))
+rownames(new_results) <- names(results)
+colnames(new_results) <- c("pval", "beta_coef", "bonf")
+
+print(paste0(round(sum(new_results$bonf)*100/length(new_results$bonf)), "%")) # proportion significative
+print(sum(new_results$bonf))
 
 
 ## all groups of exposures
@@ -80,9 +86,9 @@ natal<-str_split("Breastfed MatSmokeBirth HatedAsChild PhysAbuseAsChild LovedACh
 
 ## construct graph
 
-results <- results %>% 
+results <- new_results %>% 
   mutate(log_pval = ifelse(-log(pval)<75, -log(pval),75),
-         name = rownames(results),
+         name = rownames(new_results),
          group = ifelse(name %in% cigarette, "cigarette", NA),
          group = ifelse(name %in% alcohol, "alcohol", group),
          group = ifelse(name %in% drug, "drug", group),
@@ -93,31 +99,79 @@ results <- results %>%
          group = ifelse(name %in% demographic, "demographic", group),
          group = ifelse(name %in% environmental, "environmental", group),
          group = ifelse(name %in% diet, "diet", group),
-         group = ifelse(name %in% natal, "natal", group),
-         group = ifelse(is.na(group), "other", group))
+         group = ifelse(name %in% natal, "natal", group))
+
+for (i in 1:nrow(results)){
+  if (is.na(results[i,]$group)){
+    if (any(startsWith(results[i,]$name, cigarette))){
+      results[i,]$group <- "cigarette"
+    }else if (any(startsWith(results[i,]$name, alcohol))){
+      results[i,]$group <- "alcohol"
+    }else if (any(startsWith(results[i,]$name, drug))){
+      results[i,]$group <- "drug"
+    }else if (any(startsWith(results[i,]$name, socioeconomic))){
+      results[i,]$group <- "socioeconomic"
+    }else if (any(startsWith(results[i,]$name, violence))){
+      results[i,]$group <- "violence"
+    }else if (any(startsWith(results[i,]$name, stress))){
+      results[i,]$group <- "stress"
+    }else if (any(startsWith(results[i,]$name, physactivity))){
+      results[i,]$group <- "physactivity"
+    }else if (any(startsWith(results[i,]$name, demographic))){
+      results[i,]$group <- "demographic"
+    }else if (any(startsWith(results[i,]$name, environmental))){
+      results[i,]$group <- "environmental"
+    }else if (any(startsWith(results[i,]$name, diet))){
+      results[i,]$group <- "diet"
+    }else if (any(startsWith(results[i,]$name, natal))){
+      results[i,]$group <- "natal"
+    }else{
+      results[i,]$group <- "other"
+    }
+  }
+}
+
+#results <- results %>% 
+# mutate(log_pval = ifelse(-log(pval)<75, -log(pval),75),
+#       name = rownames(results),
+#      group = ifelse(any(startsWith(name, cigarette)), "cigarette", NA),
+#     group = ifelse(any(startsWith(name, alcohol)), "alcohol", group),
+#    group = ifelse(any(startsWith(name, drug)), "drug", group),
+#   group = ifelse(any(startsWith(name, socioeconomic)), "socioeconomic", group),
+#  group = ifelse(any(startsWith(name, violence)), "violence", group),
+# group = ifelse(any(startsWith(name, stress)), "stress", group),
+#group = ifelse(any(startsWith(name, physactivity)), "physactivity", group),
+#group = ifelse(any(startsWith(name, demographic)), "demographic", group),
+#group = ifelse(any(startsWith(name, environmental)), "environmental", group),
+#group = ifelse(any(startsWith(name, diet)), "diet", group),
+#group = ifelse(any(startsWith(name, natal)), "natal", group),
+#group = ifelse(is.na(group), "other", group))
 
 results <- results %>%
   arrange(group)
 
-#
-# get results of x (beta coefs) ------------------------------------------------
-
-
 
 
 # Volcano plot ------------------------------------------------------------
-## no one-hot encoding_unadjusted
-## no one-hot encoding_withoutadjusted
-## one-hot encoding_unadjusted
-## one-hot encoding_withoutadjusted
 
-
-## x: beta coefs, y: -log10(p_val)
+## one-hot encoding_adjusted (with labels)
 results %>%
-  ggplot(aes(x= beta, y=-log10(pvalue), col=group)) +
+  ggplot(aes(x= beta_coef, y=log_pval, col=group)) +
   geom_point() + 
-  geom_vline(xintercept=c(-0.5, 0.5), col="red") +
-  geom_hline(yintercept=-log10(0.05/dim(results)[1]), col="red") +
-  ggtitle("Volcano plot of all p_values, coloured by group, with a Bonferroni correction: analysis without the outliers")
+  geom_vline(xintercept=c(-0.005, 0.005), col="red", lty = 2) +
+  geom_hline(yintercept=-log10(0.05/dim(results)[1]), col="red", lty = 2) +
+  geom_label_repel(data = results, # Add labels last to appear as the top layer  
+                   aes(label = name),
+                   force = 2,
+                   nudge_y = -log10(0.05/dim(results)[1]), nudge_x = 0.005)
+  ggtitle("Volcano plot of all p_values, adjusted for sex and age (Bonferroni corrected): analysis without the outliers")
 
-
+  
+  ## one-hot encoding_adjusted (without labels)
+  results %>%
+    ggplot(aes(x= beta_coef, y=log_pval, col=group)) +
+    geom_point() + 
+    geom_vline(xintercept=c(-0.005, 0.005), col="red", lty = 2) +
+    geom_hline(yintercept=-log10(0.05/dim(results)[1]), col="red", lty = 2) +
+  ggtitle("Volcano plot of all p_values, adjusted for sex and age (Bonferroni corrected): analysis without the outliers")
+  

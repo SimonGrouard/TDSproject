@@ -48,3 +48,7 @@ tempData <- knn.impute(
 #tempData <- mice(df_fin,m=5,maxit=50,meth='pmm',seed=500)
 
 saveRDS(tempData,("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/bio_imputed.rds"))
+
+bio_imputed <- data.frame(bio_imputed)
+row.names(bio_imputed) <- row.names(df_fin)
+saveRDS(bio_imputed, 'bio_imputed.rds')

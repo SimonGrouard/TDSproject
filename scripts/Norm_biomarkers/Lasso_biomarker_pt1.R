@@ -68,8 +68,8 @@ names(betas_2)=rownames(coef(best_model, s='lambda.1se'))[-1]
 #plotting beta values-----------------------
 
 #'best' lambda beta values
-#pdf('Beta_plot.pdf')
-#plot(lasso_bio_pt1_2[lasso_bio_pt1_2!=0], type = 'h', col='navy', lwd=2, xaxt='n', xlab='', ylab='Beta')
-#axis(side = 1, at = 1:sum(lasso_bio_pt1_2!=0), labels = names(lasso_bio_pt1_2)[lasso_bio_pt1_2!=0], las=2, cex.axis = 0.5)
-#abline(h=0, lty=2)
-#dev.off()
+pdf('Beta_plot_imp.pdf')
+plot(lasso_best_betas_imp[lasso_best_betas_imp!=0], type = 'h', col='navy', lwd=2, xaxt='n', xlab='', ylab='Beta')
+axis(side = 1, at = 1:sum(lasso_best_betas_imp!=0), labels = names(lasso_best_betas_imp)[lasso_best_betas_imp!=0], las=2, cex.axis = 0.5)
+abline(h=0, lty=2)
+dev.off()
