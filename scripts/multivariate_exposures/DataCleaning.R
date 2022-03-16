@@ -6,6 +6,7 @@ data <- exposures %>%
   mutate(AdjTSRatio = telomere_length$AdjTSRatio.0.0,
          ZAdjTSRatio = telomere_length$ZAdjTSRatio.0.0)
 test_data <- head(data, 1000)
+readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/recoded/dataForimpute.rds")
 
 ## handle NAs
 NA_Exposure <- as.data.frame(colSums(is.na(data)))

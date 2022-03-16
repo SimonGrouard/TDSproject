@@ -49,6 +49,6 @@ tempData <- knn.impute(
 
 saveRDS(tempData,("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/bio_imputed.rds"))
 
-bio_imputed <- data.frame(bio_imputed)
-row.names(bio_imputed) <- row.names(df_fin)
-saveRDS(bio_imputed, 'bio_imputed.rds')
+#bio_imputed <- data.frame(bio_imputed)
+#row.names(bio_imputed) <- row.names(df_fin)
+#saveRDS(bio_imputed, 'bio_imputed.rds')

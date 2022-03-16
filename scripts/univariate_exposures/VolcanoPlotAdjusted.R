@@ -5,7 +5,7 @@ suppressMessages(library(RColorBrewer))
 suppressMessages(library(ggplot2))
 suppressMessages(library(ggrepel))
 
-results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/hotencoded_adjusted_volcano/"
+results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_univariate_exposures/hotencoded_adjusted_volcano/"
 
 ## results from the analysis
 get_results <- function(path, results){
@@ -150,7 +150,7 @@ for (i in 1:nrow(results)){
 results <- results %>%
   arrange(group)
 
-
+saveRDS(results,'/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/ComparisonWithUni/uni_res.rds')
 
 # Volcano plot ------------------------------------------------------------
 

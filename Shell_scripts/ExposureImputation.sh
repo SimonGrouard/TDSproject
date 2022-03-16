@@ -3,8 +3,7 @@
 #PBS -N 1node1core
 
 
-cd /rds/general/project/hda_21-22/live/TDS/Group_6/scripts/multivariate_exposures/
+cd /rds/general/project/hda_21-22/live/TDS/Group_6/scripts/
 module load anaconda3/personal
 
-
-Rscript lasso_exposures3.R
+Rscript ExposureImputation.R 
