@@ -23,10 +23,10 @@ data$tlen <- gen$AdjTSRatio.0.0
 #data filtering based on a 20% NA threshold------------------------------
 
 #filtering rows that have more than 20% missingness
-data_fil <- data %>% filter(rowSums(is.na(data))< 0.2*(ncol(data)))
+#data_fil <- data %>% filter(rowSums(is.na(data))< 0.2*(ncol(data)))
 
 #filtering out those with no telomere length
-data_fil <- data_fil %>% filter(!is.na(tlen))
+data_fil <- data %>% filter(!is.na(tlen))
 
 ##filtering out columns with more than 20% NA
 
@@ -47,8 +47,14 @@ tempData <- knn.impute(
 )
 #tempData <- mice(df_fin,m=5,maxit=50,meth='pmm',seed=500)
 
-saveRDS(tempData,("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/bio_imputed.rds"))
+saveRDS(tempData,("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/bio_imputed_2.rds"))
+library(dplyr)
+
+biomarker_nNightingale_final$tlen <- telomere_length$AdjTSRatio.0.0
+biomarker_nNightingale_final_2 <- biomarker_nNightingale_final[!is.na(biomarker_nNightingale_final$tlen),]
 
 #bio_imputed <- data.frame(bio_imputed)
-#row.names(bio_imputed) <- row.names(df_fin)
-#saveRDS(bio_imputed, 'bio_imputed.rds')
+
+#exposures <- exposures %>% filter(!is.na(tlen))
+row.names(bio) <- row.names(exposures_2)
+saveRDS(biomarker_nNightingale_final_2, 'bio_not_impute.rds')

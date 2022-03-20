@@ -1,9 +1,9 @@
 uni <- readRDS('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_nightingale_biomarker_univ/univ_pval_beta_adj_biomarker.rds')
 uni <- data.frame(uni)
 uni <- arrange(uni, desc(pval))
-
+uni$pval <- as.numeric(uni$pval)
 uni_select <- subset(uni, uni$pval <= 0.05)
-uni_select <- arrange(uni_select, desc(beta_coef))
+uni_select <- arrange(uni_select, desc(beta))
 selected_uni = rownames(uni_select)
 
 ## plot

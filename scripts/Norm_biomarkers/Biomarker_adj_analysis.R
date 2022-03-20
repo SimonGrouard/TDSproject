@@ -16,7 +16,7 @@ data$sex <- gen$GeneticSex.0.0
 data$age <- Exposures_covariates_recoded_combined_final$AgeAssess
 data$tlen <- gen$AdjTSRatio.0.0
 
-data <- data[sample(1:nrow(data), 1000), ]
+#data <- data[sample(1:nrow(data), 1000), ]
 #running only on count data
 #data <- data %>% select(-contains("Count"))
 
@@ -37,4 +37,4 @@ for (j in 1:ncol(data)){
 #saving results
 final <- cbind(colnames(data), pval, beta)
 
-saveRDS(final,("univ_pval_beta_adj_biomarker.rds"))
+saveRDS(final,("univ_pval_beta_adj_biomarker_2.rds"))
