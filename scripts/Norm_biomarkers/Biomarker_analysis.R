@@ -217,7 +217,45 @@ comb_sample %>%
 
 ##Adjusted univariate analysis----------------------
 
-adj <- readRDS('../Results_nightingale_biomarker_univ/Results_biomarker_univ_3/univ_pval_adj_biomarker.rds')
+adj <- readRDS('../../Results/Results_nightingale_biomarker_univ/Results_biomarker_univ_3/univ_pval_adj_biomarker.rds')
+adj <- data.frame(adj)
+adj$pval <- as.numeric(as.character(adj$pval))
+adj <- arrange(adj, desc(pval))
+adj <- adj[c(-53),]
+adj <- adj[c(-52),]
+adj <- adj[c(-51),]
+adj <- adj[-c(8),]
+adj <- adj[-c(8),]
+adj <- adj[-c(2),]
+adj <- adj[-c(19),]
+
+#adj$pval <- as.numeric(levels(adj$pval))[adj$pval]
+
+plot(-log10(adj$pval),pch=16,ylab="-log(p-values)")
+abline(h=-log10(0.05/ncol(adj)), col='red')
+abline(h=-log10(0.05), col='blue')
+
+
+table(adj$pval<=(0.05))
+#39 significant at 0.05
+
+adj$pvalBF <- p.adjust(adj$pval, method="bonf")
+table(adj$pvalBF<=(0.05))
+#33 significant for BF 0.05
+
+adj$pvalBH <- p.adjust(adj$pval, method="BH")
+table(adj$pval<=(0.05))
+#39 significant for BH
+
+#which are most significant
+adj_order <- adj[order(adj$pval), ]
+
+saveRDS(adj_order, 'Biomarker_adj_df.rds')
+
+
+#Adjusted univariate analysis with data from beta dataframe
+
+adj <- readRDS('../../Results/Results_nightingale_biomarker_univ/univ_pval_beta_adj_biomarker_2.rds')
 adj <- data.frame(adj)
 adj <- adj[c(-53),]
 adj <- adj[c(-52),]
@@ -243,10 +281,12 @@ table(adj$pval<=(0.05))
 
 #which are most significant
 adj_order <- adj[order(adj$pval), ]
+adj_order_2 <- adj[order(adj$pvalBF), ]
+saveRDS(adj_order_2, 'Biomarker_adj_df.rds')
+adj_order_2$beta <- as.numeric(levels(adj_order_2$beta))[adj_order_2$beta]
+adj_order_2$beta<- format(round(adj_order_2$beta, 3), nsmall = 3)
 
-saveRDS(adj_order, 'Biomarker_adj_df.rds')
-
-
+beta_order <- beta[order(beta$betas),]
 #Adjusted count data analysis----------------------------
 
 adj_count <- readRDS('../../Results_nightingale_biomarker_univ/Results_biomarker_univ_3/univ_pval_adj_biomarker_count.rds')
@@ -254,7 +294,6 @@ adj_count <- readRDS('../../Results_nightingale_biomarker_univ/Results_biomarker
 adj_count <- data.frame(adj_count)
 
 adj_count$pval <- as.numeric(levels(adj_count$pval))[adj_count$pval]
-
 adj_count <- adj_count[c(-46),]
 adj_count <- adj_count[c(-45),]
 adj_count <- adj_count[c(-44),]
@@ -282,3 +321,46 @@ adj_count_order <- adj_count[order(adj_count$pval),]
 adj_perc <- readRDS('../../Results_nightingale_biomarker_univ/Results_biomarker_univ_3/univ_pval_adj_biomarker_perc.rds')
 
 adj_perc <- data.frame(adj_perc)
+
+adj_perc$pval <- as.numeric(levels(adj_perc$pval))[adj_perc$pval]
+
+adj_perc <- adj_perc[c(-44),]
+adj_perc <- adj_perc[c(-43),]
+adj_perc <- adj_perc[c(-42),]
+
+plot(-log10(adj_perc$pval),pch=16,ylab="-log(p-values)")
+abline(h=-log10(0.05/ncol(adj_perc)), col='red')
+abline(h=-log10(0.05), col='blue')
+
+
+table(adj_perc$pval<=(0.05))
+#31 significant at 0.05
+
+adj_perc$pvalBF <- p.adjust(adj_perc$pval, method="bonf")
+table(adj_perc$pvalBF<=(0.05))
+#27 significant for BF 0.05
+
+adj_perc$pvalBH <- p.adjust(adj_perc$pval, method="BH")
+table(adj_perc$pval<=(0.05))
+#31 significant for BH
+
+adj_perc_order <- adj_perc[order(adj_perc$pval),]
+
+
+#assessment of imputed dataset distribution-------------------------------
+bio_imp <- readRDS('../../extraction_and_recording/outputs/final/bio_imputed.rds')
+
+summary(bio_imp)
+
+summary(data)
+
+ggplot() + 
+  geom_density(data=data, aes(x=WBCCount.0.0), color='green', fill='green') + 
+  geom_density(data=bio_imp, aes(x=WBCCount.0.0), color='red', alpha=.3)
+
+ggplot() + 
+  geom_density(data=data, aes(x=NucRBCPerc.0.0), color='green', fill='green') + 
+  geom_density(data=bio_imp, aes(x=NucRBCPerc.0.0), color='red', alpha=.3)
+
+
+df_agg <- aggregate(df,by=list(pam_fit_n_ap_3$cluster),FUN=mean)

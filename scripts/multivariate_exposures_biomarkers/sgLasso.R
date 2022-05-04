@@ -1,97 +1,20 @@
-suppressPackageStartupMessages(library(sgPLS))
+# 1- Packages and imports ------------------------------------------------------
+#suppressPackageStartupMessages(library(sgPLS))
+#suppressPackageStartupMessages(library(sglOptim))
+suppressPackageStartupMessages(library(gglasso))
+suppressPackageStartupMessages(library(tidyverse))
 
-args=commandArgs(trailingOnly=TRUE)
-data_path=toString(args[1])
+#args=commandArgs(trailingOnly=TRUE)
+#data_path=toString(args[1])
 
-biomarkers <- readRDS(paste0(data_path, "final/bio_imputed.rds"))
-exposures <- readRDS()
+#biomarkers <- readRDS(paste0(data_path, "final/bio_imputed_2.rds"))
+#exposures <- readRDS(paste0(data_path,"final/Exposures_unimputed.rds"))
+biomarkers <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/bio_imputed_2.rds")
+exposures <- readRDS("/rds/general/project/hda_21-22/live/TDS/Group_6/extraction_and_recording/outputs/final/Exposures_unimputed.rds")
 
+# 2- Groups of variables  ------------------------------------------------------
 
-## Functions
-
-
-CalibratesgPLS=function(dataX, dataY, ncomp=1, Nrepeat=100, name="1", Xgroups, Alpha=seq(0.9, 0, by=-0.1)){
-  TmpSummary=NULL
-  SelectedGroups=NULL
-  SelectedAlpha=NULL
-  comp_error=NULL
-  
-  all_ids=1:length(dataY)
-  for (comp in 1:ncomp){
-    for (NGroups in 1:(length(Xgroups)+1)){
-      print(NGroups)
-      for (alpha in Alpha){
-        error=NULL
-        TmpGroups=c(SelectedGroups, NGroups)
-        TmpAlpha=c(SelectedAlpha, alpha)
-        TmpsgPLS <- sgPLS(dataX, dataY, ncomp = comp, ind.block.x = Xgroups, keepX = TmpGroups, alpha.x = TmpAlpha)
-        pb=txtProgressBar(style=3)
-        for (i in 1:Nrepeat){
-          folds=MergeLists(lapply(split(1:length(dataY), f=dataY), FUN=function(x){split(x, rep(1:5, length.out=length(x)))}))
-          for (l in 1:length(folds)){
-            test_ids=folds[[l]]
-            train_ids=all_ids[!all_ids%in%test_ids]
-            dataX_train=dataX[train_ids,]
-            dataY_train=dataY[train_ids]
-            dataX_test=dataX[test_ids,]
-            dataY_test=dataY[test_ids]
-            
-            sgPLS_train <- sgPLS(dataX_train, dataY_train, ncomp=comp, 
-                                   ind.block.x=Xgroups, keepX=TmpGroups, alpha.x=TmpAlpha)
-            predicted=predict(sgPLS_train, newdata=dataX_test, dist="max.dist")
-            mytable=table(dataY_test, predicted$class$max.dist)
-            misclassif_rate=1-sum(diag(mytable))/sum(mytable)
-            error=c(error, misclassif_rate)
-          }
-          
-          setTxtProgressBar(pb, i/Nrepeat)
-        }
-        print(alpha)
-        TmpSummary=rbind(TmpSummary, c(comp, NGroups, alpha, mean(error)))
-        TmpSummary=as.data.frame(TmpSummary, stringsAsFactors = FALSE)
-        colnames(TmpSummary)=c("Ncomp", "NGroups", "alpha", "error")
-      }
-    }
-    SelectedGroups=c(SelectedGroups, TmpSummary$NGroups[TmpSummary$Ncomp==comp][which.min(TmpSummary$error[TmpSummary$Ncomp==comp])])
-    SelectedAlpha=c(SelectedAlpha, TmpSummary$alpha[TmpSummary$Ncomp==comp][which.min(TmpSummary$error[TmpSummary$Ncomp==comp])])
-    comp_error=c(comp_error, min(TmpSummary$error[TmpSummary$Ncomp==comp]))
-  }
-  
-  if (ncomp>1){
-    names(comp_error)=paste0("Comp", seq(1,ncomp))
-    res=list(Summary=TmpSummary, CompMinError=comp_error, 
-             NComp=which.min(comp_error), 
-             NGroup=SelectedGroups[1:which.min(comp_error)], alpha=SelectedAlpha[1:which.min(comp_error)])
-  } else {
-    res=list(Summary=TmpSummary, MinError=comp_error, 
-             NGroup=TmpSummary$NGroups[which.min(TmpSummary$error)], alpha=TmpSummary$alpha[which.min(TmpSummary$error)])
-  }
-  return(res)
-}
-
-PlotCalib=function(res, ncomp_selected=1, main=NULL){ # only for sparse group PLS
-    par(mar=c(5,7,3,1))
-    plot(1:sum(res$Summary$Ncomp==ncomp_selected),
-         res$Summary$error[res$Summary$Ncomp==ncomp_selected],
-         type="l", xaxt="n", xlab="", ylab="Misclassification rate",
-         main="sgPLS calibration", cex.lab=1.5)
-    axis(side=1, at=1:sum(res$Summary$Ncomp==ncomp_selected),
-         labels=res$Summary$alpha[res$Summary$Ncomp==ncomp_selected])
-    tmp=c(which(!duplicated(res$Summary$NGroups[res$Summary$Ncomp==ncomp_selected]))-0.5, sum(res$Summary$Ncomp==ncomp_selected)+0.5)
-    abline(v=tmp, lty=2, col="grey")
-    axis(side=1, at=tmp, labels=NA, line=2.5)
-    axis(side=1, at=apply(rbind(tmp[-1], tmp[-length(tmp)]),2,mean),
-         labels=unique(res$Summary$NGroups), line=2.5, tick=FALSE)
-    points(which.min(res$Summary$error[res$Summary$Ncomp==ncomp_selected]),
-           res$Summary$error[res$Summary$Ncomp==ncomp_selected][which.min(res$Summary$error[res$Summary$Ncomp==ncomp_selected])],
-           pch=19, col="red")
-    mtext("Penalty", side=1, line=1, at=0, adj=1)
-    mtext("Number of groups", side=1, line=3.5, at=0, adj=1)
-}
-
-
-## all groups of exposures
-
+### exposure groups
 
 #Cigarette impacts 
 cigarette<-str_split("SmokeCurr SmokePast HouseSmokers LightSmoke TobacTypePrevSmok EverSmokStop6MoPlus SmokStatus PrevSmokAllDays EverSmok TobSmok PackYrsSmok AvgNPackYrLife HomeSmokeExp OutHomeSmokeExp FormSmokAgeStart NCigPrevSmokeDay AgeSmokEnd NUnsuccSmokStop AgeStopSmok CurrentSmokeAmount", " ")[[1]]
@@ -135,13 +58,12 @@ diet<-str_split("OilyFish1 NonOilyFish ProcMeat Poultry1 Beef1 Lamb1 Pork1 Chees
 
 natal<-str_split("Breastfed MatSmokeBirth HatedAsChild PhysAbuseAsChild LovedAChild MolestedAsChild BirthWeight MumAge FatherAge", " ")[[1]]
 
-
 ## organise by group membership in exposures
 
+exposure_variables <- data.frame(name = colnames(exposures))
+exposure_variables$name <- as.character(exposure_variables$name)
 
-exposures_variables <- data.frame(name = colnames(exposures))
-
-exposures_variables <- exposure_variables %>% 
+exposure_variables <- exposure_variables %>% 
   mutate(group = ifelse(name %in% cigarette, "cigarette", NA),
          group = ifelse(name %in% alcohol, "alcohol", group),
          group = ifelse(name %in% drug, "drug", group),
@@ -184,43 +106,79 @@ for (i in 1:nrow(exposure_variables)){
   }
 }
 
-exposure_variables <- exposure_variables %>% group_by(group)
+exposure_variables <- arrange(exposure_variables, group)
 
 exposures <- exposures[, exposure_variables$name] # the exposures are now regrouped
 
-# we compare the shifted vector to itself to see which index are associated with which groups:
-group_index <- which(exposure_variables$group[-1] != exposure_variables[-length(exposure_variables)])
+### biomarkers groups
+
+# blood cells
+
+blood_cells <- str_split("WBCCount PlateletCount LymphCount MonocyteCount NeutCount EosCount BasoCount NuclRBCCount LymphPerc MonoPerc NeuPerc EosPerc BasoPerc NucRBCPerc ReticPerc ReticCount", " ")[[1]]
+
+biomarker_variables <- data.frame(name = colnames(biomarkers))
+biomarker_variables$name <- as.character(biomarker_variables$name)
+
+biomarker_variables <- biomarker_variables %>% mutate(group = NA)
+
+for (i in 1:nrow(biomarker_variables)){
+  if (is.na(biomarker_variables[i,]$group)){
+    if (any(startsWith(biomarker_variables[i,]$name, blood_cells))){
+      biomarker_variables[i,]$group <- "blood_cells"
+    } else {
+      biomarker_variables[i,]$group <- "non_blood_cells"
+    }
+  }
+}
+
+biomarker_variables <- arrange(biomarker_variables, group)
+
+biomarkers <- biomarkers[, biomarker_variables$name] # the biomarkers are now regrouped
 
 
-## calibrate sgPLS
+# 3- Combine exposures and biomarkers ------------------------------------------
 
-# We keep only one component in the model
-# Indeed, we will not reuse the data in each component for further analyses 
-# (like we would do in dimensionality reduction), we just use PLS to infer which variables
-# and which groups are important, and this can be seen directly in the first component
+# Identifying rownames that are common
+rown <- rownames(biomarkers)
+rowb <- rownames(exposures)
+exposures <- exposures[rownames(exposures) %in% rown, ] 
+biomarkers <- biomarkers[rownames(biomarkers) %in% rowb, ]
 
+# Combining dataframes
+bio_exposures <- cbind(exposures, biomarkers)
 
+# To remove telomere length variable from bio_exposures
+bio_exposures_wo_TS <- subset(bio_exposures, select = -c(AdjTSRatio, tlen))
+
+# Create the group indexes 
+exposure_biomarker_variables <- rbind(exposure_variables, biomarker_variables)
+exposure_biomarker_variables <- exposure_biomarker_variables[!(exposure_biomarker_variables$name %in% c("AdjTSRatio", "tlen")),]
+
+group_index <- which(exposure_biomarker_variables$group[-1] != exposure_biomarker_variables$group[-dim(exposure_biomarker_variables)[1]])
+group_index <- c(1, group_index, dim(exposure_biomarker_variables)[1])
+group_indexes <- NULL
+for (i in 1:(length(group_index)-1)){
+  group_indexes <- c(group_indexes, rep(i, group_index[i+1]-group_index[i]))
+}
+group_indexes <- c(1, group_indexes)
+
+exposure_biomarker_variables <- cbind(exposure_biomarker_variables, group_indexes)
+
+# 4- Analysis! Finally ---------------------------------------------------------
+
+# if doesn't work: take subset of dataframe
+# bio_exposures_subset <- bio_exposures[sample(nrow(bio_exposures), 215), ] #214 is okay, 215 takes a pretty long time, and more takes absurd amount of time...
+# bio_exposures_wo_TS_subset <- subset(bio_exposures_subset, select = -c(AdjTSRatio, tlen))
+bio_exposures_wo_TS <- subset(bio_exposures, select = -c(AdjTSRatio, tlen))
+
+# actual analysis
+x = as.matrix(bio_exposures_wo_TS)
+y = bio_exposures$AdjTSRatio
 set.seed(1)
-res_sgpls = CalibratesgPLS(dataX = exposures, dataY = biomarkers, Xgroups = group_index,
-                               ncomp = 1, Nrepeat = 5)
+glasso_bio_exposures <- cv.gglasso(x = x, y = y, group = group_indexes)
 
-ifelse(dir.exists("../../Results/Results_pls_analysis"),"",dir.create("../../Results/Results_pls_analysis"))
-saveRDS(res_sgpls, "../../Results/Results_pls_analysis/results_calibration_sgpls.rds")
-
-png("../../Results/Results_pls_analysis/calibration_sgpls.png")
-PlotCalib(res = res_sgpls)
-dev.off()
-
-
-## run sgPLS on calibrated model
-
-
-MysgPLS <- sgPLS(exposures, biomarkers, ncomp = 1, ind.block.x = group_index, 
-                 keepX = res_sgpls$NGroups, alpha.x = res_sgpls$alpha)
-
-saveRDS(MysgPLS, "../../Results/Results_pls_analysis/results_sgPLS.rds")
-
-
+pre = coef(glasso_bio_exposures$gglasso.fit, s = glasso_bio_exposures$lambda.min) # all coef are equal to 0 is 215 rows or less...
+write.csv(pre, "/rds/general/project/hda_21-22/live/TDS/Group_6/scripts/multivariate_exposures_biomarkers/sLasso_results.csv")
 
 
 

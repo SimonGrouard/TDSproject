@@ -1,7 +1,7 @@
 suppressMessages(library(tidyverse))
 suppressMessages(library(RColorBrewer))
 
-results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results_univariate_exposures/hotencoded_adjusted/"
+results_path <- "/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_univariate_exposures/hotencoded_adjusted/"
 
 ## results from the analysis
 get_results <- function(path, results){
@@ -71,7 +71,8 @@ natal<-str_split("Breastfed MatSmokeBirth HatedAsChild PhysAbuseAsChild LovedACh
 ## construct graph
 
 results <- results %>% 
-  mutate(log_pval = ifelse(-log(pval)<75, -log(pval),75),
+  mutate(#log_pval = ifelse(-log(pval)<75, -log(pval),75),
+         log_pval = -log(pval),
          name = rownames(results),
          group = ifelse(name %in% cigarette, "cigarette", NA),
          group = ifelse(name %in% alcohol, "alcohol", group),

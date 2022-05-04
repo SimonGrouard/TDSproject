@@ -28,8 +28,8 @@ bio_exposures <- cbind(exposures, bio_imputed_reduced)
 bio_exposures_wo_TS <- subset(bio_exposures, select = -c(AdjTSRatio, tlen))
 
 # Analysis ----------------------------------------------------------------
-bio_exposures_test <- head(bio_exposures_wo_TS, 1000)
-bio_exposures_test_TS <- head(bio_exposures, 1000)
+# bio_exposures_test <- head(bio_exposures_wo_TS, 1000)
+# bio_exposures_test_TS <- head(bio_exposures, 1000)
 
 # Setting penalty factor for Age and Sex, where if they are 0 they will always be selected
 penalty_factor <-
@@ -38,8 +38,8 @@ penalty_factor <-
 penalty_factor <-
   as.integer(!penalty_factor)
 
-x = as.matrix(bio_exposures_test)
-y = as.matrix(bio_exposures_test_TS$AdjTSRatio)
+x = as.matrix(bio_exposures_wo_TS)
+y = as.matrix(bio_exposures$AdjTSRatio)
 
 # Stability selection -------------------------
 
@@ -54,7 +54,6 @@ dev.off()
 
 # Calibrated selection proportions 
 selprop <- SelectionProportions(stability_selection_lasso)
-selprop <- data.frame(selprop)
 
 saveRDS(selprop, here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.rds'))
 
@@ -65,7 +64,7 @@ saveRDS(hat_params, here::here('Results/exposures_biomarker_lasso/exposures_bio_
 
 # Visualisation of selection proportions
 
-# pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.pdf'))
+pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.pdf'))
 par(mar = c(10, 5, 5, 1))
 
 plot(selprop, type = "h", lwd = 3, las = 1, 
@@ -81,7 +80,7 @@ for (i in 1:length(selprop)){
        col = ifelse(selprop >= hat_params[2], yes = "blue", no = "grey"), 
        col.axis = ifelse(selprop[i] >=hat_params[2], yes = "blue", no = "grey"))
 }
-# dev.off()
+dev.off()
 
 
 
