@@ -210,10 +210,10 @@ selected_lasso_lambda.min = names(beta_lasso_lambda.min)[which(beta_lasso_lambda
 saveRDS(selected_lasso_lambda.min, "/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/Sensitivity/Male/Lasso/selected_beta_lasso.min.rds")
 print(paste0(length(selected_lasso_lambda.min), " exposures are selected when using lambda.min"))
 
-pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/Sensitivity/Male/Lasso/lambda.min_lasso_selected_exposures.pdf')
-plot(beta_lasso_lambda.min[beta_lasso_lambda.min != 0], type = "h", col = "navy", lwd = 3,
-     xaxt = "n", xlab = "", ylab = expression(beta_lasso_lambda.min))
-axis(side = 1, at = 1:sum(beta_lasso_lambda.min != 0), labels = names(beta_lasso_lambda.min)[beta_lasso_lambda.min != 0], las = 2, cex.axis = 0.35)
+pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/Sensitivity/Male/Lasso/lambda.min_lasso_selected_exposures_new.pdf')
+plot(beta_lasso.min[beta_lasso.min != 0], type = "h", col = "navy", lwd = 3,
+     xaxt = "n", xlab = "", ylab = expression(beta_lasso.min))
+axis(side = 1, at = 1:sum(beta_lasso.min != 0), labels = names(beta_lasso.min)[beta_lasso.min != 0], las = 2, cex.axis = 0.35)
 abline(h = 0, lty = 2)
 dev.off()
 

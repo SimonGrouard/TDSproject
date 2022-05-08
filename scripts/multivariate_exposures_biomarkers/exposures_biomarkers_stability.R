@@ -48,39 +48,43 @@ stability_selection_lasso <-
                     penalty.factor= penalty_factor, 
                     family="gaussian")
 
-pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_calibration.pdf'))
-CalibrationPlot(stability_selection_lasso)
-dev.off()
+# pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_calibration.pdf'))
+# CalibrationPlot(stability_selection_lasso)
+# dev.off()
+
+# Obtaining mean beta values
+mean_beta <- apply(stability_selection_lasso$Beta, 2, mean)
+saveRDS(mean_beta, here::here('Results/exposures_biomarker_lasso/mean_betas.rds'))
 
 # Calibrated selection proportions 
 selprop <- SelectionProportions(stability_selection_lasso)
 
-saveRDS(selprop, here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.rds'))
+# saveRDS(selprop, here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.rds'))
 
 # Calibrated parameters
 hat_params <- Argmax(stability_selection_lasso)
 print(hat_params)
-saveRDS(hat_params, here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_hat_params.rds'))
+# saveRDS(hat_params, here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_hat_params.rds'))
 
 # Visualisation of selection proportions
 
-pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.pdf'))
-par(mar = c(10, 5, 5, 1))
-
-plot(selprop, type = "h", lwd = 3, las = 1, 
-     xlab = "", ylab = "Selection Proportions", xaxt = "n", 
-     col = ifelse(selprop >= hat_params[2], yes = "blue", no = "grey"),
-     cex.lab = 1.5)
-
-abline(h = hat_params[2], lty = 2, col = "darkred")
-
-for (i in 1:length(selprop)){
-  axis(side = 1, at = i, labels = names(selprop)[i], las = 2, 
-       cex.axis = 0.25,
-       col = ifelse(selprop >= hat_params[2], yes = "blue", no = "grey"), 
-       col.axis = ifelse(selprop[i] >=hat_params[2], yes = "blue", no = "grey"))
-}
-dev.off()
+# pdf(here::here('Results/exposures_biomarker_lasso/exposures_bio_stability_selection_proportions.pdf'))
+# par(mar = c(10, 5, 5, 1))
+# 
+# plot(selprop, type = "h", lwd = 3, las = 1, 
+#      xlab = "", ylab = "Selection Proportions", xaxt = "n", 
+#      col = ifelse(selprop >= hat_params[2], yes = "blue", no = "grey"),
+#      cex.lab = 1.5)
+# 
+# abline(h = hat_params[2], lty = 2, col = "darkred")
+# 
+# for (i in 1:length(selprop)){
+#   axis(side = 1, at = i, labels = names(selprop)[i], las = 2, 
+#        cex.axis = 0.25,
+#        col = ifelse(selprop >= hat_params[2], yes = "blue", no = "grey"), 
+#        col.axis = ifelse(selprop[i] >=hat_params[2], yes = "blue", no = "grey"))
+# }
+# dev.off()
 
 
 

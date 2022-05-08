@@ -73,11 +73,11 @@ for (i in 1:length(selprop)){
 dev.off()
 
 ## Visualisation of selection proportions of all variables
-pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/SelProp_all.pdf')
+pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/SelProp_all_new.pdf')
 par(mar = c(10, 5, 5, 1))
 plot(selprop_all, type = "h", lwd = 3, las = 1, 
      xlab = "", ylab = "Selection Proportions", xaxt = "n", 
-     col = ifelse(selprop_all >= hat_params[2], yes = "blue", no = "grey"),
+     col = ifelse(selprop_all >= hat_params_all[2], yes = "blue", no = "grey"),
      cex.lab = 1.5)
 abline(h = hat_params_all[2], lty = 2, col = "darkred")
 for (i in 1:length(selprop_all)){
@@ -164,24 +164,47 @@ for (i in 1:length(selprop_all)){
 dev.off()
 
 ### SS vs univariate analyses
-selected_uni <- subset(uni_res, uni_res$pval < 0.05)
+selected_uni <- subset(uni_res, uni_res$pval < 0.05/340) # Bonferroni multiple test correction
 selected_uni_varnames <- rownames(selected_uni)
 
 SPforPlot <- subset(SelProp_all, SelProp_all>= hat_params_all[2])
-uni_SelProp <- subset(SelProp_all, names(SelProp_all)%in%rownames(uni_res))
+uni_SelProp <- subset(SelProp_all, names(SelProp_all)%in%rownames(selected_uni))
 
-pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/SSvsUni.all.pdf')
+
+pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/SSvsUni_new.all.pdf')
 par(mar = c(10, 5, 5, 1))
 plot(uni_SelProp, type = "h", lwd = 3, las = 1, 
      xlab = "", ylab = "Selection Proportions", xaxt = "n", 
-     col = ifelse(uni_SelProp>= hat_params_all[2], yes = "blue", no = "grey"),
+     col = ifelse(names(uni_SelProp)%in%names(SPforPlot), yes = "blue", no = "grey"),
      cex.lab = 1.5,
      main = "Comparison between Stability Selection and Univariate Analyses")
 abline(h = hat_params_all[2], lty = 2, col = "darkred")
 for (i in 1:length(uni_SelProp)){
-  axis(side = 1, at = i, labels = names(uni_SelProp)[i], las = 2, cex.axis = 0.25,
+  axis(side = 1, at = i, labels = names(uni_SelProp)[i], las = 2, cex.axis = 0.3,
        col = ifelse(uni_SelProp>= hat_params_all[2], yes = "blue", no = "grey"),
        col.axis = ifelse(uni_SelProp[i] >= hat_params_all[2], yes = "blue", no = "grey"))
 }
 dev.off()
 
+
+# extract betas for stability selection
+mean_beta <- apply(out_all$Beta, 2, mean)
+saveRDS(mean_beta, '/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/mean_betas.rds')
+## extract out those with >90% selection proportion:
+sel_prop_90 <- SelProp_all[SelProp_all >= hat_params_all[2]]
+mean_betas_sel_prop_90 <- mean_betas[names(mean_betas) %in% names(sel_prop_90)]
+
+## Visualisation of selection proportions
+pdf('/rds/general/project/hda_21-22/live/TDS/Group_6/Results/Results_multivariate_exposures/StabilitySelection/SS_beta.pdf')
+par(mar = c(10, 5, 5, 1))
+plot(mean_betas_sel_prop_90, type = "h", lwd = 3, las = 1, 
+     xlab = "", ylab = "Beta Coefficients of Stability Selection", xaxt = "n", 
+     col = "blue",
+     cex.lab = 1.5)
+for (i in 1:length(mean_betas_sel_prop_90)){
+  axis(side = 1, at = i, labels = names(mean_betas_sel_prop_90)[i], las = 2, 
+       cex.axis = 0.6,
+       col = "blue",
+       col.axis = "blue")
+}
+dev.off()
